@@ -1,3 +1,10 @@
+Making a run at upgrading HTTP Builder to Apache 
+# TODO 
+- [ ] Move to a Gradle Build
+- [ ] Get tests passing/rewrite tests
+- [ ] upgrade to Apache http client 4.5.2
+
+
 HTTPBuilder = Easy HTTP client for Groovy.
 
 Build Instructions:

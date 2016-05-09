@@ -1,3 +1,6 @@
-target/
+build/
 *.iml
 .idea/
+gradle/
+.gradle/
+.settings/
