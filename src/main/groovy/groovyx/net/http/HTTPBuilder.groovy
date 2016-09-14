@@ -22,7 +22,7 @@
 package groovyx.net.http;
 
 import static groovyx.net.http.URIBuilder.convertToURI;
-import groovy.lang.Closure;
+
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -485,8 +485,8 @@ public class HTTPBuilder {
                         HttpEntity entity = resp.getEntity();
                         try {
                             if ( entity == null || entity.getContentLength() == 0 )
-                                closureArgs = new Object[] { resp, null };
-                            else closureArgs = new Object[] { resp, parseResponse( resp, contentType ) };
+                                closureArgs =  { resp, null };
+                            else closureArgs = { resp, parseResponse( resp, contentType ) };
                         }
                         catch ( Exception ex ) {
                             Header h = entity.getContentType();

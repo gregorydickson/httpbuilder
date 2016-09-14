@@ -23,17 +23,124 @@ package groovyx.net.http
 
 import org.junit.Ignore
 import org.junit.Test
+import org.junit.BeforeClass
+import org.junit.AfterClass
 import static groovyx.net.http.ContentType.*
 import static groovyx.net.http.Method.*
 import java.util.concurrent.ExecutionException
 import org.apache.http.conn.ConnectTimeoutException
+
+//https://github.com/RestExpress/RestExpress
+import io.netty.handler.codec.http.HttpMethod
+import org.restexpress.Request
+import org.restexpress.Response
+import org.restexpress.RestExpress
+
+import java.util.concurrent.*
 
 /**
  * @author tnichols
  */
 public class AsyncHTTPBuilderTest {
 
-    @Test public void testAsyncRequests() {
+    static final ExecutorService myExecutor = Executors.newCachedThreadPool() 
+    
+    //https://github.com/RestExpress/RestExpress
+    // run a REST server for testing
+    @BeforeClass
+    public static void createServer() {
+        
+         myExecutor.execute(new Runnable() {
+            public void run() {
+                RestExpress server = new RestExpress()
+                    .setName("Item");
+
+                server.uri("/item", new Object()
+                {
+                    private static List<Integer> items = new ArrayList<Integer>();
+                    @SuppressWarnings("unused")
+                    public String read(Request req, Response res)
+                    {
+                        String value = req.getHeader("itemId");
+                        res.setContentType("application/json");
+
+                        if (value == null)
+                        {
+                            
+                            return '{"error":"no ID specified"}'
+                        }
+                        else
+                        {
+                            return '{"id":"' + value + '"}'
+                        }
+                    }
+
+                    public String create(Request req, Response res)
+                    {
+                        String value = req.getHeader("itemId");
+                        res.setContentType("application/json");
+                        items.add((Integer) value);
+                        if (value == null)
+                        {
+                            
+                            return '{"error":"no ID specified"}'
+                        }
+                        else
+                        {
+                            return '{"id":"' + value + '"}'
+                        }
+                    }
+                    public String delete(Request req, Response res)
+                    {
+                        String value = req.getHeader("itemId");
+                        res.setContentType("application/json");
+
+                        if (value == null)
+                        {
+                            
+                            return '{"error":"no ID specified"}'
+                        }
+                        else
+                        {
+                            return '{"id":"' + value + '"}'
+                        }
+                    }
+                    public String update(Request req, Response res)
+                    {
+                        String value = req.getHeader("itemId");
+                        res.setContentType("application/json");
+
+                        if (value == null)
+                        {
+                            
+                            return '{"error":"no ID specified"}'
+                        }
+                        else
+                        {
+                            return '{"id":"' + value + '"}'
+                        }
+                    }
+                })
+                .noSerialization()
+
+                server.bind(9000)
+
+                server.awaitShutdown()
+                println("*************************** RUNNING REST SERVER *************")
+            }
+        });
+        // Server needs time to startup before tests run.
+        Thread.sleep(500);
+    }
+
+    @AfterClass
+    public static void shutdown() {
+        myExecutor.shutdown()
+    }
+
+
+    @Test 
+    public void testAsyncRequests() {
         def http = new AsyncHTTPBuilder( poolSize : 4,
                         uri : 'http://hc.apache.org',
                         contentType : ContentType.HTML )
@@ -76,7 +183,8 @@ public class AsyncHTTPBuilderTest {
     }
 
     @Ignore
-    @Test public void testDefaultConstructor() {
+    @Test 
+    public void testDefaultConstructor() {
         def http = new AsyncHTTPBuilder()
         def resp = http.get( uri:'http://ajax.googleapis.com',
                     path : '/ajax/services/search/web',
@@ -89,40 +197,38 @@ public class AsyncHTTPBuilderTest {
         http.shutdown()
     }
 
-    @Test public void testPostAndDelete() {
-        def http = new AsyncHTTPBuilder(uri:'https://api.twitter.com/1.1/statuses/')
+    @Test 
+    public void testPostAndDelete() {
+        def http = new AsyncHTTPBuilder(uri:'http://localhost:9000/item')
 
-        http.auth.oauth System.getProperty('twitter.oauth.consumerKey'),
-                System.getProperty('twitter.oauth.consumerSecret'),
-                System.getProperty('twitter.oauth.accessToken'),
-                System.getProperty('twitter.oauth.secretToken')
+        
 
         http.client.params.setBooleanParameter 'http.protocol.expect-continue', false
 
         def msg = "AsyncHTTPBuilder unit test was run on ${new Date()}"
 
-        def resp = http.post(path : 'update.json',
-            body:[status:msg,source:'httpbuilder1'] )
+        def resp = http.post(path : 'item',
+            body:[id:1111] )
 
         while ( ! resp.done  ) Thread.sleep 2000
         def postID = resp.get().id
         assert postID
 
-        // delete the test message.
+        /* delete the test message.
         resp = http.request( DELETE, JSON ) { req ->
-            uri.path = "destroy/${postID}.json"
+            uri.path = "/${postID}"
 
             response.success = { resp2, json ->
                 assert json.id != null
                 assert resp2.statusLine.statusCode == 200
-                println "Test tweet ID ${json.id} was deleted."
+                println "Test item was deleted."
                 return json
             }
         }
 
         while ( ! resp.done  ) Thread.sleep( 2000 )
-        assert resp.get().id == postID
-        http.shutdown()
+        assert resp.get().id == postID 
+        http.shutdown()*/
     }
 
 

@@ -121,8 +121,8 @@ public class EncoderRegistry implements Iterable<Map.Entry<String,Closure>> {
 
         if ( data instanceof ByteArrayInputStream ) {
             // special case for ByteArrayIS so that we can set the content length.
-            ByteArrayInputStream in = ((ByteArrayInputStream)data);
-            entity = new InputStreamEntity( in, in.available() );
+            ByteArrayInputStream aByteArrayInputStream = data;
+            entity = new InputStreamEntity( aByteArrayInputStream, aByteArrayInputStream.available() );
         }
         else if ( data instanceof InputStream ) {
             entity = new InputStreamEntity( (InputStream)data, -1 );

@@ -1,16 +1,19 @@
-Making a run at upgrading HTTP Builder to Apache 
+Making a run at upgrading HTTP Builder to Apache Client 4.5.2
+
 # TODO 
-- [ ] Move to a Gradle Build
+- [x] Move to a Gradle Build
 - [ ] Get tests passing/rewrite tests
 - [ ] upgrade to Apache http client 4.5.2
+- [ ] upgrade Groovy to 2.4.?
+- [ ] Change junit tests to Spock tests
 
 
 HTTPBuilder = Easy HTTP client for Groovy.
 
 Build Instructions:
 
- HTTPBuilder is built using Apache Maven (http://maven.apache.org)
- $ mvn install
+ HTTPBuilder is built using Gradle
+ $ gradle install
 
 Documentation: https://github.com/jgritman/httpbuilder/wiki
 
@@ -26,6 +29,10 @@ Contributions:
  This project also includes source code written by Martin Blom (martin@blom.org)
  in the 'thirdparty' package.  It is licensed under the LGPL v3 and
  re-distributed with permission from the author.
+
+
+Run a Test in Debug Mode:
+gradle -d -Dtest.single=AsyncHTTPBuilderTest test
 
 
 License:
